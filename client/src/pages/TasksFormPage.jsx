@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { createTask, deleteTask, updateTask, getTask } from '../api/Tasks.api';
 import { useNavigate, useParams } from 'react-router-dom';
+import {toast} from 'react-hot-toast'
 
 export function TasksFormPage() {
     const { register, handleSubmit, formState: { errors }, setValue } = useForm();
@@ -12,8 +13,22 @@ export function TasksFormPage() {
         if (params.id) {
             console.log("Actualizando");
             await updateTask(params.id, data);
+            toast.success('updated Task', {
+                position: 'top-right',
+                style: {
+                    background: 'blue',
+                    color: 'white',
+                }
+            });
         } else {
             await createTask(data);
+            toast.success('Task created', {
+                position: 'top-right',
+                style: {
+                    background: 'blue',
+                    color: 'white',
+                }
+            });
         }
         navigate('/tasks');
     });
@@ -33,27 +48,39 @@ export function TasksFormPage() {
     }, [params.id]);
 
     return (
-        <div>
+        <div className='max-w-xl mx-auto'>
             <form onSubmit={onSubmit}>
                 <input type="text"
                 placeholder="title"
-                {...register("title", { required: true })} />
+                {...register("title", { required: true })}
+                className='bg-slate-300 p-3 rounded-lg block w-full mb-3' />
                 {errors.title && <p>Title is required</p>}
 
                 <textarea rows={3}
                 placeholder="Description"
-                {...register("description", { required: true })}></textarea>
+                {...register("description", { required: true })}
+                className='bg-slate-300 p-3 rounded-lg block w-full mb-3'
+                ></textarea>
                 {errors.description && <p>Description is required</p>}
 
-                <button type="submit">Save</button>
+                <button type="submit" className='bg-indigo-500 p-3 rounded-lg block w-full mt-3'>Save</button>
             </form>
 
             {
                 params.id && (
-                    <button onClick={async () => {
+                    <button
+                    className='bg-red-500 p-3 rounded-lg block w-48 mt-3'
+                     onClick={async () => {
                         const accepted = window.confirm('Are you sure?');
                         if (accepted) {
                             await deleteTask(params.id);
+                            toast.success('Deleted task', {
+                                position: 'top-right',
+                                style: {
+                                    background: 'blue',
+                                    color: 'white',
+                                }
+                            });
                             navigate('/tasks');
                         }
                     }}>Delete</button>
